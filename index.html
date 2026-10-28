@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Edukasi Bahasa Inggris Kelas 5 - SD IT Al-Fikri</title>
+    <!-- Tailwind CSS untuk Desain Modern & Responsif -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jsPDF untuk Cetak Sertifikat PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Canvas Confetti untuk Efek Perayaan -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 50%, #fefce8 100%);
+            min-height: 100vh;
+        }
+        h1, h2, h3, .font-game {
+            font-family: 'Fredoka', sans-serif;
+        }
+        .option-btn {
+            transition: all 0.2s ease;
+        }
+        .option-btn:hover {
+            transform: translateY(-2px);
+        }
+        .option-selected {
+            background-color: #0284c7 !important;
+            color: white !important;
+            border-color: #0369a1 !important;
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-12">
+
+    <!-- Header / Navbar -->
+    <header class="bg-gradient-to-r from-emerald-600 to-teal-700 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white text-emerald-700 p-2 rounded-xl font-bold text-xl shadow">🏫</div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-bold tracking-wide">SD IT AL-FIKRI</h1>
+                    <p class="text-xs text-emerald-100">Fun with English - Grade V SD/MI (Erlangga) Semester 1</p>
+                </div>
+            </div>
+            <div id="userBadge" class="hidden bg-emerald-800/70 px-3 py-1.5 rounded-full text-sm font-semibold border border-emerald-400/30">
+                👤 <span id="navStudentName"></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto px-4 mt-6">
+
+        <!-- 1. LAYAR LOGIN / INPUT NAMA SISWA -->
+        <section id="loginScreen" class="bg-white rounded-3xl shadow-xl p-6 md:p-10 border-4 border-emerald-500/20 text-center max-w-xl mx-auto mt-8">
+            <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 shadow-inner">
+                🎓
+            </div>
+            <h2 class="text-2xl md:text-3xl font-bold text-emerald-800 mb-2">Welcome, Super Students!</h2>
+            <p class="text-slate-600 mb-6 text-sm md:text-base">
+                Selamat datang di Kuis Interaktif Bahasa Inggris Kelas 5 <strong>SD IT Al-Fikri</strong>. Masukkan nama lengkapmu untuk dicetak pada <strong>Sertifikat PDF</strong> di akhir permainan!
+            </p>
+
+            <div class="text-left space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Nama Lengkap Siswa *</label>
+                    <input type="text" id="studentNameInput" placeholder="Contoh: Ahmad Fauzan Al-Fikri" 
+                        class="w-full px-4 py-3 rounded-xl border-2 border-slate-300 focus:border-emerald-500 focus:outline-none font-semibold text-slate-800">
+                    <p id="nameError" class="text-red-500 text-xs mt-1 hidden">⚠️ Mohon isi nama lengkap terlebih dahulu!</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Kelas (Opsional)</label>
+                    <input type="text" id="studentClassInput" value="Kelas 5 SD IT Al-Fikri" 
+                        class="w-full px-4 py-3 rounded-xl border-2 border-slate-300 focus:border-emerald-500 focus:outline-none font-semibold text-slate-800">
+                </div>
+                <button onclick="goToMenu()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-game font-bold text-lg py-3.5 rounded-xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5">
+                    Mulai Petualangan Belajar 🚀
+                </button>
+            </div>
+        </section>
+
+        <!-- 2. LAYAR PILIH BAB (MENU) -->
+        <section id="menuScreen" class="hidden space-y-6">
+            <div class="bg-white rounded-3xl shadow-md p-6 border-l-8 border-emerald-600 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">Halo, <span id="welcomeName" class="text-emerald-600"></span>! 👋</h2>
+                    <p class="text-slate-600 text-sm">Pilih materi bab latihan di bawah ini atau kerjakan semua bab sekaligus untuk mendapatkan sertifikat nilai penuh.</p>
+                </div>
+                <button onclick="changeName()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg font-semibold shrink-0">
+                    ✏️ Ganti Nama
+                </button>
+            </div>
+
+            <!-- Paket Semua Bab -->
+            <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-3xl p-6 text-white shadow-lg flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <span class="bg-white/25 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Rekomendasi Utama</span>
+                    <h3 class="text-2xl font-bold mt-2">🏆 Tantangan Lengkap Semester Ganjil (Semua Bab)</h3>
+                    <p class="text-amber-50 text-sm mt-1">Kerjakan seluruh 36 soal latihan (Chapter 3, Chapter 4, Chapter 5, & Final Summative Assessment) sekaligus.</p>
+                </div>
+                <button onclick="startQuiz('ALL')" class="bg-white text-orange-600 hover:bg-orange-50 font-game font-bold px-6 py-3.5 rounded-2xl shadow-md shrink-0 transition transform hover:scale-105">
+                    Mulai Semua (36 Soal) ▶
+                </button>
+            </div>
+
+            <!-- Daftar Per Bab -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Chapter 3 -->
+                <div class="bg-white rounded-2xl p-5 shadow border-2 border-slate-100 hover:border-sky-400 transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <span class="bg-sky-100 text-sky-700 font-bold text-xs px-3 py-1 rounded-full">Chapter 3</span>
+                            <span class="text-xs font-semibold text-slate-400">10 Soal</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 mt-2">🍔 Foods, Drinks, and Prices</h3>
+                        <p class="text-xs text-slate-500 mt-1">5 Soal Pilihan Ganda (Evaluation Test) + 5 Soal Isian Teks Kantin Sekolah (Siti, Lulu, Wayan, & Tomi).</p>
+                    </div>
+                    <button onclick="startQuiz('CH3')" class="mt-4 w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2.5 rounded-xl text-sm transition">
+                        Kerjakan Chapter 3
+                    </button>
+                </div>
+
+                <!-- Chapter 4 -->
+                <div class="bg-white rounded-2xl p-5 shadow border-2 border-slate-100 hover:border-rose-400 transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <span class="bg-rose-100 text-rose-700 font-bold text-xs px-3 py-1 rounded-full">Chapter 4 (Hal. 38-39)</span>
+                            <span class="text-xs font-semibold text-slate-400">10 Soal</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 mt-2">🩺 I Have a Toothache</h3>
+                        <p class="text-xs text-slate-500 mt-1">5 Soal Pilihan Ganda Keluhan Kesehatan + 5 Soal Isian Teks Bacaan (Lulu Sakit Demam & Sakit Kepala).</p>
+                    </div>
+                    <button onclick="startQuiz('CH4')" class="mt-4 w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-2.5 rounded-xl text-sm transition">
+                        Kerjakan Chapter 4
+                    </button>
+                </div>
+
+                <!-- Chapter 5 -->
+                <div class="bg-white rounded-2xl p-5 shadow border-2 border-slate-100 hover:border-purple-400 transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <span class="bg-purple-100 text-purple-700 font-bold text-xs px-3 py-1 rounded-full">Chapter 5 (Hal. 49)</span>
+                            <span class="text-xs font-semibold text-slate-400">10 Soal</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 mt-2">👔 That's Look Great! (Clothes)</h3>
+                        <p class="text-xs text-slate-500 mt-1">5 Soal Latihan Grammar (Am/Is/Are & Kalimat Negatif/Tanya) + 5 Soal Evaluation Test (Teks Wayan & Lulu).</p>
+                    </div>
+                    <button onclick="startQuiz('CH5')" class="mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-sm transition">
+                        Kerjakan Chapter 5
+                    </button>
+                </div>
+
+                <!-- Final Summative -->
+                <div class="bg-white rounded-2xl p-5 shadow border-2 border-slate-100 hover:border-emerald-400 transition flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <span class="bg-emerald-100 text-emerald-700 font-bold text-xs px-3 py-1 rounded-full">Final Assessment</span>
+                            <span class="text-xs font-semibold text-slate-400">6 Soal</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 mt-2">🍕 Final Summative Semester 1</h3>
+                        <p class="text-xs text-slate-500 mt-1">6 Soal Pilihan Ganda Evaluasi Akhir Semester 1 tentang Rasa Makanan/Minuman (Tastes) & Quantifiers.</p>
+                    </div>
+                    <button onclick="startQuiz('FINAL')" class="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-sm transition">
+                        Kerjakan Final Summative
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. LAYAR KUIS BERLANGSUNG -->
+        <section id="quizScreen" class="hidden space-y-5">
+            <!-- Top Bar Kuis -->
+            <div class="bg-white rounded-2xl p-4 shadow flex flex-wrap justify-between items-center gap-2">
+                <button onclick="backToMenuConfirm()" class="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg">
+                    ⬅ Kembali ke Menu
+                </button>
+                <div class="text-center">
+                    <span id="quizCategoryBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800"></span>
+                </div>
+                <div class="text-sm font-bold text-slate-700">
+                    Soal <span id="currentQIndex" class="text-emerald-600">1</span> / <span id="totalQCount">10</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
+                <div id="progressBar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 10%"></div>
+            </div>
+
+            <!-- Kotak Teks Bacaan (Muncul jika soal memiliki teks bacaan) -->
+            <div id="readingBox" class="hidden bg-amber-50 border-2 border-amber-300 rounded-2xl p-5 shadow-sm">
+                <div class="flex items-center gap-2 text-amber-800 font-bold text-sm mb-2">
+                    <span>📖</span> <span id="readingInstruction">Read the text carefully!</span>
+                </div>
+                <p id="readingContent" class="text-slate-800 text-sm md:text-base leading-relaxed italic bg-white p-4 rounded-xl border border-amber-200"></p>
+            </div>
+
+            <!-- Kartu Soal -->
+            <div class="bg-white rounded-3xl shadow-lg p-6 md:p-8 border-2 border-slate-100">
+                <div class="flex items-center justify-between mb-3">
+                    <span id="questionTypeBadge" class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-sky-100 text-sky-800">Pilihan Ganda</span>
+                </div>
+
+                <!-- Teks Soal -->
+                <div id="questionText" class="text-lg md:text-xl font-bold text-slate-800 whitespace-pre-line leading-relaxed mb-4"></div>
+
+                <!-- Ilustrasi SVG (Khusus Soal Pizza No. 6 Final Summative) -->
+                <div id="questionImageContainer" class="hidden my-4 flex justify-center"></div>
+
+                <!-- Pilihan Jawaban -->
+                <div id="optionsContainer" class="grid grid-cols-1 gap-3 mt-4"></div>
+            </div>
+
+            <!-- Navigasi Soal -->
+            <div class="flex justify-between items-center pt-2">
+                <button id="prevBtn" onclick="prevQuestion()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-5 py-3 rounded-xl transition disabled:opacity-40">
+                    ⬅ Sebelumnya
+                </button>
+                <button id="nextBtn" onclick="nextQuestion()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-xl shadow-md transition">
+                    Selanjutnya ➡
+                </button>
+                <button id="finishBtn" onclick="finishQuiz()" class="hidden bg-amber-500 hover:bg-amber-600 text-white font-game font-bold px-8 py-3 rounded-xl shadow-lg transition transform hover:scale-105">
+                    ✅ Selesai & Lihat Nilai
+                </button>
+            </div>
+        </section>
+
+        <!-- 4. LAYAR HASIL, KUNCI JAWABAN & SERTIFIKAT PDF -->
+        <section id="resultScreen" class="hidden space-y-6">
+            <!-- Kartu Nilai & Sertifikat -->
+            <div class="bg-white rounded-3xl shadow-xl p-6 md:p-8 text-center border-4 border-emerald-500/30">
+                <div class="text-5xl mb-2">🎉🏆🎉</div>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-800">Alhamdulillah, Latihan Selesai!</h2>
+                <p class="text-slate-600 mt-1">Berikut adalah hasil evaluasi belajar untuk <strong id="resultStudentName" class="text-emerald-700"></strong>:</p>
+
+                <div class="my-6 inline-block bg-gradient-to-br from-emerald-50 to-teal-100 border-2 border-emerald-300 rounded-3xl px-10 py-6 shadow-inner">
+                    <div class="text-sm font-bold text-emerald-800 uppercase tracking-wider" id="resultModuleTitle"></div>
+                    <div class="text-6xl font-game font-bold text-emerald-600 my-2" id="finalScoreText">100</div>
+                    <div class="text-sm font-bold text-slate-700">
+                        Benar: <span id="correctCountText" class="text-emerald-600">0</span> dari <span id="totalCountText">0</span> Soal
+                    </div>
+                    <div id="gradeBadge" class="mt-3 inline-block px-4 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white"></div>
+                </div>
+
+                <!-- Tombol Download Sertifikat PDF -->
+                <div class="flex flex-col sm:flex-row justify-center gap-3 mt-2">
+                    <button onclick="downloadCertificatePDF()" class="bg-amber-500 hover:bg-amber-600 text-white font-game font-bold text-lg px-8 py-4 rounded-2xl shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2">
+                        📜 Unduh Sertifikat PDF Sekarang
+                    </button>
+                    <button onclick="returnToMenu()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-6 py-4 rounded-2xl transition">
+                        🔄 Pilih Bab Lainnya
+                    </button>
+                </div>
+            </div>
+
+            <!-- Rincian Pembahasan & Kunci Jawaban -->
+            <div class="bg-white rounded-3xl shadow-lg p-6 md:p-8">
+                <h3 class="text-xl font-bold text-slate-800 mb-4 border-b pb-3">
+                    📝 Rincian Penilaian & Kunci Jawaban Benar
+                </h3>
+                <div id="reviewContainer" class="space-y-4"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // =========================================================================
+        // DATABASE SOAL (SESUAI PRESISI DENGAN GAMBAR BUKU PAKET ERLANGGA KELAS 5)
+        // =========================================================================
+        const textCh3 = "At break time, Siti and her friends, Lulu, Wayan, and Tomi, go to the school canteen. Siti buys a plate of fried rice for Rp15,000 because she is very hungry, while Wayan takes a bowl of soup for Rp10,000 because he wants something light. Lulu feels thirsty, so she buys a glass of orange juice for Rp8,000. Meanwhile, Tomi buys a slice of cake for Rp12,000 for dessert. On the table, there is also a loaf of bread for Rp10,000 that they share. They pay together and enjoy their meal before going back to class.";
+
+        const textCh4 = "This morning, Lulu didn't go to school. She stayed at home because she felt sick. Her mother came to her room and asked, \"What's wrong with you, Lulu?\" Lulu said, \"I have a headache and a fever, Mom.\" Her mother touched her forehead and said, \"Oh, you are very hot.\"\nHer mother then gave her some medicine and a glass of warm water. \"You should take some medicine and get some rest,\" she said. Lulu lay down on her bed and closed her eyes. After a few hours, she felt a little better. Her mother smiled and said, \"I hope you will be well soon.\" Lulu said, \"Thank you, Mom.\"";
+
+        const textCh5 = "This morning, Wayan is going to school. He is wearing a white shirt, a red skirt, and a red tie. He also wears black shoes. His uniform looks clean and tidy. At school, her friend says, \"You look nice today.\" Wayan smiles and says, \"Thank you.\" Then he says, \"Alhamdulillah.\" In the classroom, the teacher is wearing a brown uniform. The students are wearing their school uniforms. They all look neat and ready to learn.";
+
+        const allQuestions = [
+            // ================= CHAPTER 3: EVALUATION TEST (PG 1-5) =================
+            {
+                id: "ch3_pg1",
+                chapter: "CH3",
+                chapterTitle: "Chapter 3 - Prices of Food and Drinks",
+                type: "Multiple Choice (Evaluation Test)",
+                question: "1. A sandwich costs Rp12,000.\nThe correct statement is ....",
+                options: [
+                    "a. A sandwich is twelve thousand rupiahs",
+                    "b. A sandwich are twelve thousand rupiahs",
+                    "c. A sandwich cost twelve thousand rupiahs",
+                    "d. A sandwich costing twelve thousand rupiahs"
+                ],
+                correct: 0,
+                explanation: "Subjek tunggal 'A sandwich' menggunakan to be 'is' (A sandwich is twelve thousand rupiahs). Opsi (c) salah karena tanpa akhiran -s pada kata kerja 'cost'."
+            },
+            {
+                id: "ch3_pg2",
+                chapter: "CH3",
+                chapterTitle: "Chapter 3 - Prices of Food and Drinks",
+                type: "Multiple Choice (Evaluation Test)",
+                question: "2. Siti is in a bakery. She wants some bread. She asks, \"How much is the bread?\" The waiter says ...",
+                options: [
+                    "a. Yes, it is bread",
+                    "b. It is Rp10,000",
+                    "c. It is yummy",
+                    "d. It is delicious"
+                ],
+                correct: 1,
+                explanation: "Pertanyaan 'How much is the bread?' menanyakan harga roti, sehingga jawaban yang tepat adalah menyebutkan harganya yaitu 'It is Rp10,000'."
+            },
+            {
+                id: "ch3_pg3",
+                chapter: "CH3",
+                chapterTitle: "Chapter 3 - Prices of Food and Drinks",
+                type: "Multiple Choice (Evaluation Test)",
+                question: "3. \"I drink a cup of tea. It is cheap. It is only Rp3,000. The coconut drink is Rp10,000. It is ...\"",
+                options: [
+                    "a. expensive",
+                    "b. delicious",
+                    "c. more expensive",
+                    "d. more delicious"
+                ],
+                correct: 0,
+                explanation: "Lawan kata dari 'cheap' (murah, Rp3.000) untuk minuman kelapa seharga Rp10.000 adalah 'expensive' (mahal) atau jika dibandingkan menjadi 'more expensive'. Dalam materi dasar bab ini (tanpa kata 'than'), kosakata pasangan cheap adalah expensive (a)."
+            },
+            {
+                id: "ch3_pg4",
+                chapter: "CH3",
+                chapterTitle: "Chapter 3 - Prices of Food and Drinks",
+                type: "Multiple Choice (Evaluation Test)",
+                question: "4. \"The juice costs Rp7,000.\"\nThe correct question is ...",
+                options: [
+                    "a. Who is the juice?",
+                    "b. What is the juice?",
+                    "c. Where is the juice?",
+                    "d. How much is the juice?"
+                ],
+                correct: 3,
+                explanation: "Untuk menanyakan harga ('costs Rp7,000'), kalimat tanya yang tepat adalah 'How much is the juice?'."
+            },
+            {
+                id: "ch3_pg5",
+                chapter: "CH3",
+                chapterTitle: "Chapter 3 - Prices of Food and Drinks",
+                type: "Multiple Choice (Evaluation Test)",
+                question: "5. Nala buys a sandwich for Rp20,000 and milk for Rp10,000. The correct sentence is ...",
+                options: [
+                    "a. She pays Rp25,000",
+                    "b. She pays Rp30,000",
+                    "c. She pays Rp15,000",
+                    "d. She pays Rp20,000"
+                ],
+                correct: 1,
+                explanation: "Rp20,000 (sandwich) + Rp10,000 (milk) = Rp30,000. Jadi kalimat yang benar adalah 'She pays Rp30,000'."
+            },
+
+            // ================= CHAPTER 3: FILL IN THE BLANKS (1-5) =================
+            {
+                id: "ch3_fb1",
+                chapter: "CH3",
+                chapterTitle: "Chapter 3 - Let's fill in the blanks!",
+                type: "Fill in the Blanks (Reading Text)",
+                readingInstruction: "Read the text for answer the question number 1–5!",
+                readingText: textCh3,
+                question: "1. The total price of all the food and drinks is ....",
+                options: [
+                    "a. Rp45,000",
+                    "b. Rp50,000",
+                    "c. Rp55,000 (fifty-five thousand rupiahs)",
+                    "d. Rp60,000"
+                ],
+                correct: 2,
+                explanation: "Rincian harga di teks: Fried rice (Rp15,000) + Soup (Rp10,000) + Orange juice (Rp8,000) + Cake (Rp12,000) + Bread (Rp10,000) = Rp55,000."
+            },
+            {
+                id: "ch3_fb2",
+                chapter: "CH3",
+                chapterTitle: "Chapter 3 - Let's fill in the blanks!",
+                type: "Fill in the Blanks (Reading Text)",
+                readingInstruction: "Read the text for answer the question number 1–5!",
+                readingText: textCh3,
+                question: "2. If they pay Rp60,000, the change is ....",
+                options: [
+                    "a. Rp5,000 (five thousand rupiahs)",
+                    "b. Rp10,000",
+                    "c. Rp15,000",
+                    "d. Rp2,000"
+                ],
+                correct: 0,
+                explanation: "Uang yang dibayar Rp60,000 dikurangi total harga Rp55,000 = uang kembaliannya (change) adalah Rp5,000."
+            },
+            {
+                id: "ch3_fb3",
+                chapter: "CH3",
+                chapterTitle: "Chapter 3 - Let's fill in the blanks!",
+                type: "Fill in the Blanks (Reading Text)",
+                readingInstruction: "Read the text for answer the question number 1–5!",
+                readingText: textCh3,
+                question: "3. The most expensive item is ....",
+                options: [
+                    "a. a bowl of soup",
+                    "b. a glass of orange juice",
+                    "c. a slice of cake",
+                    "d. a plate of fried rice"
+                ],
+                correct: 3,
+                explanation: "Makanan paling mahal (most expensive) di dalam teks adalah sepiring nasi goreng ('a plate of fried rice') seharga Rp15,000."
+            },
+            {
+                id: "ch3_fb4",
+                chapter: "CH3",
+                chapterTitle: "Chapter 3 - Let's fill in the blanks!",
+                type: "Fill in the Blanks (Reading Text)",
+                readingInstruction: "Read the text for answer the question number 1–5!",
+                readingText: textCh3,
+                question: "4. The cheapest item is ....",
+                options: [
+                    "a. a loaf of bread",
+                    "b. a glass of orange juice",
+                    "c. a bowl of soup",
+                    "d. a slice of cake"
+                ],
+                correct: 1,
+                explanation: "Item paling murah (cheapest) di dalam teks adalah segelas jus jeruk ('a glass of orange juice') seharga Rp8,000."
+            },
+            {
+                id: "ch3_fb5",
+                chapter: "CH3",
+                chapterTitle: "Chapter 3 - Let's fill in the blanks!",
+                type: "Fill in the Blanks (Reading Text)",
+                readingInstruction: "Read the text for answer the question number 1–5!",
+                readingText: textCh3,
+                question: "5. The total price of Siti's and Tomi's food is ....",
+                options: [
+                    "a. Rp23,000",
+                    "b. Rp25,000",
+                    "c. Rp27,000 (twenty-seven thousand rupiahs)",
+                    "d. Rp30,000"
+                ],
+                correct: 2,
+                explanation: "Makanan Siti (fried rice = Rp15,000) + Makanan Tomi (a slice of cake = Rp12,000) = Rp27,000."
+            },
+
+            // ================= CHAPTER 4: EVALUATION TEST (PG 1-5) =================
+            {
+                id: "ch4_pg1",
+                chapter: "CH4",
+                chapterTitle: "Chapter 4 - I Have a Toothache (Page 38)",
+                type: "Multiple Choice (Evaluation Test)",
+                question: "1. After swimming, I feel bad in my ear. I have an ....",
+                options: [
+                    "a. earache",
+                    "b. sore throat",
+                    "c. stomachache",
+                    "d. cough"
+                ],
+                correct: 0,
+                explanation: "Rasa sakit pada telinga ('feel bad in my ear') dalam bahasa Inggris disebut 'earache'."
+            },
+            {
+                id: "ch4_pg2",
+                chapter: "CH4",
+                chapterTitle: "Chapter 4 - I Have a Toothache (Page 38)",
+                type: "Multiple Choice (Evaluation Test)",
+                question: "2. Nala eats too much spicy food. Now his stomach hurts.\nNala has ....",
+                options: [
+                    "a. headache",
+                    "b. sore throat",
+                    "c. stomachache",
+                    "d. sleeps"
+                ],
+                correct: 2,
+                explanation: "Karena perutnya sakit ('his stomach hurts') akibat makan terlalu pedas, maka Nala mengalami sakit perut ('stomachache')."
+            },
+            {
+                id: "ch4_pg3",
+                chapter: "CH4",
+                chapterTitle: "Chapter 4 - I Have a Toothache (Page 38)",
+                type: "Multiple Choice (Evaluation Test)",
+                question: "3. Complete the dialogue below correctly!\nTomi : \"What's wrong with you?\"\nLulu : \"I have a toothache\"\nTomi : \"You should ....\"",
+                options: [
+                    "a. go to the dentist",
+                    "b. go swimming",
+                    "c. eat candy",
+                    "d. go shopping"
+                ],
+                correct: 0,
+                explanation: "Jika sedang sakit gigi ('toothache'), saran yang paling tepat adalah pergi ke dokter gigi ('go to the dentist')."
+            },
+            {
+                id: "ch4_pg4",
+                chapter: "CH4",
+                chapterTitle: "Chapter 4 - I Have a Toothache (Page 38)",
+                type: "Multiple Choice (Evaluation Test)",
+                question: "4. Tomi : \"I have a headache.\"\nWayan : \"....\"\nThe best respon from Wayan is ....",
+                options: [
+                    "a. Get well soon.",
+                    "b. Goodbye",
+                    "c. See you tomorrow",
+                    "d. Thank you"
+                ],
+                correct: 0,
+                explanation: "Ungkapan simpati dan doa terbaik saat teman sedang sakit adalah 'Get well soon.' (Semoga lekas sembuh)."
+            },
+            {
+                id: "ch4_pg5",
+                chapter: "CH4",
+                chapterTitle: "Chapter 4 - I Have a Toothache (Page 39)",
+                type: "Multiple Choice (Evaluation Test)",
+                question: "5. Siti : \"What's wrong?\"\nNala : \"My throat hurts. I have a ....\"",
+                options: [
+                    "a. cough",
+                    "b. sore throat",
+                    "c. fever",
+                    "d. headache"
+                ],
+                correct: 1,
+                explanation: "'My throat hurts' artinya tenggorokanku sakit, sehingga keluhannya adalah radang/sakit tenggorokan ('sore throat')."
+            },
+
+            // ================= CHAPTER 4: FILL IN THE BLANKS (1-5) =================
+            {
+                id: "ch4_fb1",
+                chapter: "CH4",
+                chapterTitle: "Chapter 4 - Let's fill in the blanks! (Page 39)",
+                type: "Fill in the Blanks (Reading Text)",
+                readingInstruction: "Read the text below to answer questions 1–5!",
+                readingText: textCh4,
+                question: "1. Lulu didn't go to ... this morning.",
+                options: [
+                    "a. school",
+                    "b. market",
+                    "c. hospital",
+                    "d. canteen"
+                ],
+                correct: 0,
+                explanation: "Berdasarkan kalimat pertama teks: 'This morning, Lulu didn't go to school.'"
+            },
+            {
+                id: "ch4_fb2",
+                chapter: "CH4",
+                chapterTitle: "Chapter 4 - Let's fill in the blanks! (Page 39)",
+                type: "Fill in the Blanks (Reading Text)",
+                readingInstruction: "Read the text below to answer questions 1–5!",
+                readingText: textCh4,
+                question: "2. Lulu felt ... so she stayed at home.",
+                options: [
+                    "a. happy",
+                    "b. hungry",
+                    "c. sick",
+                    "d. sleepy"
+                ],
+                correct: 2,
+                explanation: "Berdasarkan kalimat kedua teks: 'She stayed at home because she felt sick.'"
+            },
+            {
+                id: "ch4_fb3",
+                chapter: "CH4",
+                chapterTitle: "Chapter 4 - Let's fill in the blanks! (Page 39)",
+                type: "Fill in the Blanks (Reading Text)",
+                readingInstruction: "Read the text below to answer questions 1–5!",
+                readingText: textCh4,
+                question: "3. Lulu had a ... and a fever.",
+                options: [
+                    "a. toothache",
+                    "b. stomachache",
+                    "c. earache",
+                    "d. headache"
+                ],
+                correct: 3,
+                explanation: "Berdasarkan ucapan Lulu di teks: '\"I have a headache and a fever, Mom.\"'"
+            },
+            {
+                id: "ch4_fb4",
+                chapter: "CH4",
+                chapterTitle: "Chapter 4 - Let's fill in the blanks! (Page 39)",
+                type: "Fill in the Blanks (Reading Text)",
+                readingInstruction: "Read the text below to answer questions 1–5!",
+                readingText: textCh4,
+                question: "4. Her mother gave her some ... and warm water.",
+                options: [
+                    "a. milk",
+                    "b. medicine",
+                    "c. bread",
+                    "d. tea"
+                ],
+                correct: 1,
+                explanation: "Berdasarkan paragraf kedua teks: 'Her mother then gave her some medicine and a glass of warm water.'"
+            },
+            {
+                id: "ch4_fb5",
+                chapter: "CH4",
+                chapterTitle: "Chapter 4 - Let's fill in the blanks! (Page 39)",
+                type: "Fill in the Blanks (Reading Text)",
+                readingInstruction: "Read the text below to answer questions 1–5!",
+                readingText: textCh4,
+                question: "5. After a few hours, Lulu felt ....",
+                options: [
+                    "a. a little better",
+                    "b. very hot",
+                    "c. worse",
+                    "d. very tired"
+                ],
+                correct: 0,
+                explanation: "Berdasarkan teks: 'After a few hours, she felt a little better.'"
+            },
+
+            // ================= CHAPTER 5: LOOK AND WRITE & EVALUATION TEST =================
+            {
+                id: "ch5_gw1",
+                chapter: "CH5",
+                chapterTitle: "Chapter 5 - Look and Write (Grammar)",
+                type: "Look and Write (To Be: am / is / are)",
+                question: "1. Underline the correct word in the parentheses!\n\"Siti (am / is / are) wearing a white veil.\"",
+                options: [
+                    "a. am",
+                    "b. is",
+                    "c. are",
+                    "d. be"
+                ],
+                correct: 1,
+                explanation: "Subjek 'Siti' (tunggal / she) berpasangan dengan to be 'is' -> Siti is wearing a white veil."
+            },
+            {
+                id: "ch5_gw2",
+                chapter: "CH5",
+                chapterTitle: "Chapter 5 - Look and Write (Grammar)",
+                type: "Look and Write (To Be: am / is / are)",
+                question: "2. Underline the correct word in the parentheses!\n\"(Am / Is / Are) they wearing sport uniforms?\"",
+                options: [
+                    "a. Am",
+                    "b. Is",
+                    "c. Are",
+                    "d. Does"
+                ],
+                correct: 2,
+                explanation: "Subjek 'they' (jamak) menggunakan to be 'Are' -> Are they wearing sport uniforms?"
+            },
+            {
+                id: "ch5_gw3",
+                chapter: "CH5",
+                chapterTitle: "Chapter 5 - Look and Write (Grammar)",
+                type: "Look and Write (To Be: am / is / are)",
+                question: "3. Underline the correct word in the parentheses!\n\"We (am / is / are) wearing taqwa clothes.\"",
+                options: [
+                    "a. am",
+                    "b. is",
+                    "c. are",
+                    "d. was"
+                ],
+                correct: 2,
+                explanation: "Subjek 'We' (kami/kita) berpasangan dengan to be 'are' -> We are wearing taqwa clothes."
+            },
+            {
+                id: "ch5_gw4",
+                chapter: "CH5",
+                chapterTitle: "Chapter 5 - Look and Write (Grammar)",
+                type: "Look and Write (Negative Sentence)",
+                question: "4. Change into negative (-) sentence based on the pattern!\n(+) They are wearing uniforms.  ➔  (-) ....",
+                options: [
+                    "a. They are not wearing uniforms.",
+                    "b. They is not wearing uniforms.",
+                    "c. They not are wearing uniforms.",
+                    "d. They do not wearing uniforms."
+                ],
+                correct: 0,
+                explanation: "Kalimat negatif Present Continuous dibentuk dengan menambahkan 'not' setelah to be (am/is/are): 'They are not wearing uniforms.'"
+            },
+            {
+                id: "ch5_gw5",
+                chapter: "CH5",
+                chapterTitle: "Chapter 5 - Look and Write (Grammar)",
+                type: "Look and Write (Interrogative Sentence)",
+                question: "5. Change into interrogative (?) sentence based on the pattern!\n(+) He is wearing a jacket.  ➔  (?) ....",
+                options: [
+                    "a. He is wearing a jacket?",
+                    "b. Are he wearing a jacket?",
+                    "c. Is he wearing a jacket?",
+                    "d. Does he wearing a jacket?"
+                ],
+                correct: 2,
+                explanation: "Kalimat tanya (?) dibentuk dengan memindahkan to be 'Is' ke depan subjek 'he': 'Is he wearing a jacket?'"
+            },
+            {
+                id: "ch5_pg1",
+                chapter: "CH5",
+                chapterTitle: "Chapter 5 - That's Look Great (Page 49)",
+                type: "Multiple Choice (Evaluation Test)",
+                question: "6. (Evaluation Test No. 1) Siti is wearing a white shirt and a red skirt. The correct meaning of the sentence is ....",
+                options: [
+                    "a. Siti wears a white shirt and a red skirt every day",
+                    "b. Siti is wearing a white shirt and a red skirt now",
+                    "c. Siti will wear a white shirt and a red skirt",
+                    "d. Siti does not wear a white shirt"
+                ],
+                correct: 1,
+                explanation: "Pola 'is wearing' (Present Continuous Tense) menyatakan pakaian yang sedang dipakai sekarang (now)."
+            },
+            {
+                id: "ch5_pg2",
+                chapter: "CH5",
+                chapterTitle: "Chapter 5 - That's Look Great (Page 49)",
+                type: "Multiple Choice (Evaluation Test)",
+                question: "7. (Evaluation Test No. 2) He is wearing a jacket. The negative form of the sentence is ....",
+                options: [
+                    "a. He is not wearing a jacket",
+                    "b. He not is wearing a jacket",
+                    "c. He does not wearing a jacket",
+                    "d. He is wearing not a jacket"
+                ],
+                correct: 0,
+                explanation: "Bentuk negatif dari 'He is wearing a jacket' adalah 'He is not wearing a jacket'."
+            },
+            {
+                id: "ch5_pg3",
+                chapter: "CH5",
+                chapterTitle: "Chapter 5 - That's Look Great (Page 49)",
+                type: "Multiple Choice (Evaluation Test)",
+                question: "8. (Evaluation Test No. 3) She is wearing a dress. The correct question form is ....",
+                options: [
+                    "a. Is she wearing a dress?",
+                    "b. Are she wearing a dress?",
+                    "c. Am she wearing a dress?",
+                    "d. Does she wearing a dress?"
+                ],
+                correct: 0,
+                explanation: "Untuk mengubah 'She is wearing a dress' menjadi kalimat tanya, letakkan 'Is' di awal kalimat: 'Is she wearing a dress?'."
+            },
+            {
+                id: "ch5_pg4",
+                chapter: "CH5",
+                chapterTitle: "Chapter 5 - That's Look Great (Page 49)",
+                type: "Multiple Choice (Evaluation Test)",
+                question: "9. (Evaluation Test No. 4) The correct arrangement of the words \"wearing – is – he – a hat\" is ....",
+                options: [
+                    "a. He is wearing a hat",
+                    "b. He wearing is a hat",
+                    "c. Is he wearing a hat",
+                    "d. He is a hat wearing"
+                ],
+                correct: 0,
+                explanation: "Susunan kalimat berita yang benar (Subject + to be + V-ing + Object) adalah 'He is wearing a hat'."
+            },
+            {
+                id: "ch5_pg5",
+                chapter: "CH5",
+                chapterTitle: "Chapter 5 - That's Look Great (Page 49)",
+                type: "Multiple Choice (Evaluation Test)",
+                readingInstruction: "Bonus Reading Text on Page 49:",
+                readingText: textCh5,
+                question: "10. (Evaluation Test No. 5) Lulu is wearing a white shirt and a red skirt. She also wears a headband. The correct statement is ....",
+                options: [
+                    "a. Lulu is wearing a hat",
+                    "b. Lulu is wearing a headband",
+                    "c. Lulu is wearing shoes only",
+                    "d. Lulu is wearing a jacket"
+                ],
+                correct: 1,
+                explanation: "Pada soal disebutkan 'She also wears a headband' (bando), sehingga pernyataan yang sesuai adalah 'Lulu is wearing a headband'."
+            },
+
+            // ================= FINAL SUMMATIVE ASSESSMENT (SEMESTER 1) =================
+            {
+                id: "fin_pg1",
+                chapter: "FINAL",
+                chapterTitle: "Final Summative Assessment - Semester 1",
+                type: "Final Summative Assessment",
+                question: "1. Lulu enjoys drinking honey because of its ... taste.",
+                options: [
+                    "a. sour",
+                    "b. sweet",
+                    "c. bitter",
+                    "d. salty"
+                ],
+                correct: 1,
+                explanation: "Madu (honey) memiliki rasa yang manis ('sweet')."
+            },
+            {
+                id: "fin_pg2",
+                chapter: "FINAL",
+                chapterTitle: "Final Summative Assessment - Semester 1",
+                type: "Final Summative Assessment",
+                question: "2. The mangoes are still raw, so the taste is ....",
+                options: [
+                    "a. spicy",
+                    "b. sour",
+                    "c. sweet",
+                    "d. salty"
+                ],
+                correct: 1,
+                explanation: "Mangga yang masih mentah ('still raw') rasanya asam/kecut ('sour')."
+            },
+            {
+                id: "fin_pg3",
+                chapter: "FINAL",
+                chapterTitle: "Final Summative Assessment - Semester 1",
+                type: "Final Summative Assessment",
+                question: "3. Mother is looking for a ... to buy at the market because of its bitter flavor.",
+                options: [
+                    "a. banana",
+                    "b. strawberry",
+                    "c. bitter melon",
+                    "d. kiwi"
+                ],
+                correct: 2,
+                explanation: "Sayuran/buah yang terkenal karena rasa pahitnya ('bitter flavor') adalah pare ('bitter melon')."
+            },
+            {
+                id: "fin_pg4",
+                chapter: "FINAL",
+                chapterTitle: "Final Summative Assessment - Semester 1",
+                type: "Final Summative Assessment",
+                question: "4. Wayan : \"How does an orange taste?\"\nTomi : \"....\"",
+                options: [
+                    "a. An orange taste is sour",
+                    "b. An apple taste is sweet",
+                    "c. A mango taste is bitter",
+                    "d. A gooseberry taste is salty"
+                ],
+                correct: 0,
+                explanation: "Pertanyaan Wayan menanyakan rasa buah jeruk ('an orange'), sehingga jawaban yang menjawab tentang buah jeruk adalah 'An orange taste is sour'."
+            },
+            {
+                id: "fin_pg5",
+                chapter: "FINAL",
+                chapterTitle: "Final Summative Assessment - Semester 1",
+                type: "Final Summative Assessment",
+                question: "5. My sister is eating ... chicken for lunch.",
+                options: [
+                    "a. bitter",
+                    "b. salty",
+                    "c. sweet",
+                    "d. sour"
+                ],
+                correct: 1,
+                explanation: "Dari pilihan rasa yang tersedia (bitter, salty, sweet, sour), ayam goreng/lauk ayam ('chicken') umumnya bercita rasa gurih/asin ('salty')."
+            },
+            {
+                id: "fin_pg6",
+                chapter: "FINAL",
+                chapterTitle: "Final Summative Assessment - Semester 1",
+                type: "Final Summative Assessment",
+                hasPizzaImage: true,
+                question: "6. Look at the picture beside! It is a ....",
+                options: [
+                    "a. scoop of pizza",
+                    "b. loaf of bread",
+                    "c. piece of pizza",
+                    "d. slice of cheese"
+                ],
+                correct: 2,
+                explanation: "Gambar tersebut adalah sepotong pizza. Dalam opsi soal di buku, pilihan yang tepat adalah 'c. piece of pizza' (atau a slice of pizza)."
+            }
+        ];
+
+        // =========================================================================
+        // STATE MANAGEMENT APLIKASI
+        // =========================================================================
+        let studentName = "";
+        let studentClass = "Kelas 5 SD IT Al-Fikri";
+        let currentMode = "ALL";
+        let activeQuestions = [];
+        let currentIndex = 0;
+        let userAnswers = [];
+
+        const moduleNames = {
+            "ALL": "Semua Bab Semester Ganjil (Chapter 3, 4, 5 & Final Summative)",
+            "CH3": "Chapter 3: Foods, Drinks, and Prices",
+            "CH4": "Chapter 4: I Have a Toothache (Health & Illnesses)",
+            "CH5": "Chapter 5: That's Look Great! (Wearing Clothes)",
+            "FINAL": "Final Summative Assessment - Semester 1"
+        };
+
+        // =========================================================================
+        // FUNGSI NAVIGASI & KUIS
+        // =========================================================================
+        function goToMenu() {
+            const nameInput = document.getElementById("studentNameInput").value.trim();
+            const classInput = document.getElementById("studentClassInput").value.trim();
+            const errorEl = document.getElementById("nameError");
+
+            if (!nameInput) {
+                errorEl.classList.remove("hidden");
+                return;
+            }
+            errorEl.classList.add("hidden");
+
+            studentName = nameInput;
+            studentClass = classInput || "Kelas 5 SD IT Al-Fikri";
+
+            document.getElementById("navStudentName").textContent = studentName;
+            document.getElementById("welcomeName").textContent = studentName;
+            document.getElementById("userBadge").classList.remove("hidden");
+
+            document.getElementById("loginScreen").classList.add("hidden");
+            document.getElementById("menuScreen").classList.remove("hidden");
+        }
+
+        function changeName() {
+            document.getElementById("menuScreen").classList.add("hidden");
+            document.getElementById("loginScreen").classList.remove("hidden");
+        }
+
+        function startQuiz(mode) {
+            currentMode = mode;
+            if (mode === "ALL") {
+                activeQuestions = [...allQuestions];
+            } else {
+                activeQuestions = allQuestions.filter(q => q.chapter === mode);
+            }
+
+            currentIndex = 0;
+            userAnswers = new Array(activeQuestions.length).fill(null);
+
+            document.getElementById("menuScreen").classList.add("hidden");
+            document.getElementById("resultScreen").classList.add("hidden");
+            document.getElementById("quizScreen").classList.remove("hidden");
+
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = activeQuestions[currentIndex];
+            const total = activeQuestions.length;
+
+            // Update Header & Progress
+            document.getElementById("quizCategoryBadge").textContent = q.chapterTitle;
+            document.getElementById("currentQIndex").textContent = currentIndex + 1;
+            document.getElementById("totalQCount").textContent = total;
+            document.getElementById("progressBar").style.width = `${((currentIndex + 1) / total) * 100}%`;
+            document.getElementById("questionTypeBadge").textContent = q.type;
+
+            // Teks Bacaan (Reading Text)
+            const readingBox = document.getElementById("readingBox");
+            if (q.readingText) {
+                readingBox.classList.remove("hidden");
+                document.getElementById("readingInstruction").textContent = q.readingInstruction || "Read the text carefully!";
+                document.getElementById("readingContent").textContent = q.readingText;
+            } else {
+                readingBox.classList.add("hidden");
+            }
+
+            // Teks Pertanyaan
+            document.getElementById("questionText").textContent = q.question;
+
+            // Gambar Pizza (Khusus Soal No 6 Final Summative)
+            const imgContainer = document.getElementById("questionImageContainer");
+            if (q.hasPizzaImage) {
+                imgContainer.classList.remove("hidden");
+                imgContainer.innerHTML = `
+                    <div class="bg-amber-50 p-4 rounded-2xl border-2 border-amber-200 flex flex-col items-center">
+                        <svg width="130" height="130" viewBox="0 0 100 100">
+                            <!-- Pinggiran Roti Pizza -->
+                            <path d="M15,20 Q50,5 85,20 L50,90 Z" fill="#d97706" stroke="#92400e" stroke-width="3"/>
+                            <!-- Keju & Saus Pizza -->
+                            <path d="M20,25 Q50,13 80,25 L50,85 Z" fill="#fbbf24"/>
+                            <!-- Pepperoni -->
+                            <circle cx="42" cy="35" r="6" fill="#dc2626"/>
+                            <circle cx="60" cy="38" r="6" fill="#dc2626"/>
+                            <circle cx="48" cy="52" r="6" fill="#dc2626"/>
+                            <circle cx="51" cy="68" r="5" fill="#dc2626"/>
+                            <!-- Daun Parsley -->
+                            <circle cx="52" cy="30" r="2" fill="#15803d"/>
+                            <circle cx="38" cy="48" r="2" fill="#15803d"/>
+                        </svg>
+                        <span class="text-xs font-bold text-amber-800 mt-1">Ilustrasi Potongan Pizza (Sesuai Buku Hal. 51)</span>
+                    </div>
+                `;
+            } else {
+                imgContainer.classList.add("hidden");
+                imgContainer.innerHTML = "";
+            }
+
+            // Render Opsi Jawaban
+            const optionsContainer = document.getElementById("optionsContainer");
+            optionsContainer.innerHTML = "";
+
+            q.options.forEach((optText, idx) => {
+                const isSelected = userAnswers[currentIndex] === idx;
+                const btn = document.createElement("button");
+                btn.className = `option-btn w-full text-left px-5 py-3.5 rounded-2xl border-2 font-semibold text-base md:text-lg flex items-center justify-between ${
+                    isSelected 
+                    ? "option-selected shadow-md" 
+                    : "bg-slate-50 hover:bg-sky-50 border-slate-200 text-slate-800"
+                }`;
+                btn.innerHTML = `
+                    <span>${optText}</span>
+                    <span class="w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs ${
+                        isSelected ? "border-white bg-white text-sky-700 font-bold" : "border-slate-300"
+                    }">${isSelected ? "✓" : ""}</span>
+                `;
+                btn.onclick = () => selectOption(idx);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Tombol Navigasi Bawah
+            document.getElementById("prevBtn").disabled = currentIndex === 0;
+            if (currentIndex === total - 1) {
+                document.getElementById("nextBtn").classList.add("hidden");
+                document.getElementById("finishBtn").classList.remove("hidden");
+            } else {
+                document.getElementById("nextBtn").classList.remove("hidden");
+                document.getElementById("finishBtn").classList.add("hidden");
+            }
+        }
+
+        function selectOption(optionIdx) {
+            userAnswers[currentIndex] = optionIdx;
+            renderQuestion();
+        }
+
+        function prevQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderQuestion();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function nextQuestion() {
+            if (currentIndex < activeQuestions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function backToMenuConfirm() {
+            if (confirm("Yakin ingin kembali ke menu? Jawaban yang sedang dikerjakan akan direset.")) {
+                document.getElementById("quizScreen").classList.add("hidden");
+                document.getElementById("menuScreen").classList.remove("hidden");
+            }
+        }
+
+        function finishQuiz() {
+            // Cek apakah ada soal yang belum dijawab
+            const unanswered = userAnswers.filter(ans => ans === null).length;
+            if (unanswered > 0) {
+                if (!confirm(`Masih ada ${unanswered} soal yang belum dijawab. Yakin ingin menyelesaikan kuis sekarang?`)) {
+                    return;
+                }
+            }
+
+            // Hitung Skor
+            let correctCount = 0;
+            activeQuestions.forEach((q, idx) => {
+                if (userAnswers[idx] === q.correct) {
+                    correctCount++;
+                }
+            });
+
+            const total = activeQuestions.length;
+            const score = Math.round((correctCount / total) * 100);
+
+            // Tampilkan Hasil
+            document.getElementById("quizScreen").classList.add("hidden");
+            document.getElementById("resultScreen").classList.remove("hidden");
+
+            document.getElementById("resultStudentName").textContent = `${studentName} (${studentClass})`;
+            document.getElementById("resultModuleTitle").textContent = moduleNames[currentMode];
+            document.getElementById("finalScoreText").textContent = score;
+            document.getElementById("correctCountText").textContent = correctCount;
+            document.getElementById("totalCountText").textContent = total;
+
+            const gradeBadge = document.getElementById("gradeBadge");
+            if (score >= 90) {
+                gradeBadge.textContent = "Predikat: A (Excellent / Mumtaz!) 🌟";
+                gradeBadge.className = "mt-3 inline-block px-4 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white";
+            } else if (score >= 75) {
+                gradeBadge.textContent = "Predikat: B (Good Job / Jayyid Jiddan!) 👍";
+                gradeBadge.className = "mt-3 inline-block px-4 py-1 rounded-full text-xs font-bold bg-sky-600 text-white";
+            } else {
+                gradeBadge.textContent = "Predikat: C (Keep Practicing / Semangat Belajar!) 💪";
+                gradeBadge.className = "mt-3 inline-block px-4 py-1 rounded-full text-xs font-bold bg-amber-600 text-white";
+            }
+
+            // Efek Confetti
+            if (typeof confetti === "function") {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+
+            // Render Pembahasan & Kunci Jawaban
+            const reviewContainer = document.getElementById("reviewContainer");
+            reviewContainer.innerHTML = "";
+
+            activeQuestions.forEach((q, idx) => {
+                const userAns = userAnswers[idx];
+                const isCorrect = userAns === q.correct;
+                const userAnsText = userAns !== null ? q.options[userAns] : "Tidak dijawab";
+                const correctAnsText = q.options[q.correct];
+
+                const card = document.createElement("div");
+                card.className = `p-4 rounded-2xl border-2 ${
+                    isCorrect ? "bg-emerald-50/60 border-emerald-200" : "bg-rose-50/60 border-rose-200"
+                }`;
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start gap-2">
+                        <span class="text-xs font-bold px-2.5 py-0.5 rounded bg-white border text-slate-600">${q.chapterTitle}</span>
+                        <span class="text-xs font-bold px-3 py-1 rounded-full ${
+                            isCorrect ? "bg-emerald-600 text-white" : "bg-rose-600 text-white"
+                        }">${isCorrect ? "✓ BENAR" : "✗ SALAH"}</span>
+                    </div>
+                    <p class="font-bold text-slate-800 mt-2 whitespace-pre-line">${q.question}</p>
+                    <div class="mt-3 text-sm space-y-1">
+                        <p class="${isCorrect ? "text-emerald-700 font-bold" : "text-rose-700 font-semibold"}">
+                            Jawabanmu: ${userAnsText}
+                        </p>
+                        ${!isCorrect ? `<p class="text-emerald-700 font-bold">Jawaban Benar: ${correctAnsText}</p>` : ""}
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-slate-200/80 text-xs text-slate-600">
+                        <strong>💡 Pembahasan:</strong> ${q.explanation}
+                    </div>
+                `;
+                reviewContainer.appendChild(card);
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function returnToMenu() {
+            document.getElementById("resultScreen").classList.add("hidden");
+            document.getElementById("menuScreen").classList.remove("hidden");
+        }
+
+        // =========================================================================
+        // FUNGSI GENERATE SERTIFIKAT PDF (MENGGUNAKAN JSPDF)
+        // =========================================================================
+        function downloadCertificatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: "landscape",
+                unit: "mm",
+                format: "a4"
+            });
+
+            // Hitung nilai untuk sertifikat
+            let correctCount = 0;
+            activeQuestions.forEach((q, idx) => {
+                if (userAnswers[idx] === q.correct) correctCount++;
+            });
+            const total = activeQuestions.length;
+            const score = Math.round((correctCount / total) * 100);
+            let predicate = "GOOD EFFORT (CUKUP)";
+            if (score >= 90) predicate = "EXCELLENT / MUMTAZ (SANGAT BAIK)";
+            else if (score >= 75) predicate = "VERY GOOD / JAYYID JIDDAN (BAIK)";
+
+            // Latar Belakang Sertifikat
+            doc.setFillColor(248, 250, 252);
+            doc.rect(0, 0, 297, 210, "F");
+
+            // Bingkai Luar Hijau Zamrud (Khas SD IT Al-Fikri)
+            doc.setDrawColor(5, 150, 105);
+            doc.setLineWidth(4);
+            doc.rect(10, 10, 277, 190);
+
+            // Bingkai Dalam Emas
+            doc.setDrawColor(217, 119, 6);
+            doc.setLineWidth(1.2);
+            doc.rect(14, 14, 269, 182);
+
+            // Ornamen Sudut
+            doc.setFillColor(5, 150, 105);
+            doc.rect(14, 14, 12, 12, "F");
+            doc.rect(271, 14, 12, 12, "F");
+            doc.rect(14, 184, 12, 12, "F");
+            doc.rect(271, 184, 12, 12, "F");
+
+            // Header Sekolah
+            doc.setTextColor(5, 150, 105);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(22);
+            doc.text("SD IT AL-FIKRI", 148.5, 34, { align: "center" });
+
+            doc.setTextColor(100, 116, 139);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(11);
+            doc.text("Interactive English Learning Program - Grade V SD/MI (Erlangga Semester 1)", 148.5, 41, { align: "center" });
+
+            // Judul Sertifikat
+            doc.setTextColor(15, 23, 42);
+            doc.setFont("times", "bold");
+            doc.setFontSize(34);
+            doc.text("CERTIFICATE OF ACHIEVEMENT", 148.5, 58, { align: "center" });
+
+            // Garis Bawah Judul
+            doc.setDrawColor(217, 119, 6);
+            doc.setLineWidth(1);
+            doc.line(85, 62, 212, 62);
+
+            // Sub-teks Pemberian
+            doc.setFont("helvetica", "italic");
+            doc.setFontSize(13);
+            doc.setTextColor(71, 85, 105);
+            doc.text("Sertifikat penghargaan ini diberikan dengan bangga kepada:", 148.5, 74, { align: "center" });
+
+            // Nama Lengkap Siswa
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(28);
+            doc.setTextColor(4, 120, 87);
+            doc.text(studentName.toUpperCase(), 148.5, 90, { align: "center" });
+
+            // Kelas Siswa
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(13);
+            doc.setTextColor(100, 116, 139);
+            doc.text(studentClass, 148.5, 98, { align: "center" });
+
+            // Deskripsi Pencapaian
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(12);
+            doc.setTextColor(51, 65, 85);
+            doc.text("Telah menyelesaikan Evaluasi Latihan Bahasa Inggris Kelas 5 Semester Ganjil pada materi:", 148.5, 111, { align: "center" });
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(13);
+            doc.setTextColor(15, 23, 42);
+            doc.text(moduleNames[currentMode], 148.5, 119, { align: "center" });
+
+            // Kotak Nilai
+            doc.setFillColor(236, 253, 245);
+            doc.setDrawColor(16, 185, 129);
+            doc.setLineWidth(0.8);
+            doc.roundedRect(93.5, 125, 110, 32, 4, 4, "FD");
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(20);
+            doc.setTextColor(5, 150, 105);
+            doc.text(`NILAI AKHIR: ${score} / 100`, 148.5, 137, { align: "center" });
+
+            doc.setFontSize(10);
+            doc.setTextColor(71, 85, 105);
+            doc.text(`(Menjawab Benar ${correctCount} dari ${total} Soal  |  Predikat: ${predicate})`, 148.5, 145, { align: "center" });
+
+            // Tanggal & Tanda Tangan
+            const today = new Date().toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            });
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(11);
+            doc.setTextColor(51, 65, 85);
+            doc.text(`Diterbitkan pada: ${today}`, 55, 172, { align: "center" });
+            doc.text("Guru Bahasa Inggris Kelas 5", 240, 172, { align: "center" });
+
+            doc.setLineWidth(0.5);
+            doc.setDrawColor(148, 163, 184);
+            doc.line(30, 186, 80, 186);
+            doc.line(210, 186, 270, 186);
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.text("Sistem Evaluasi Digital", 55, 191, { align: "center" });
+            doc.text("SD IT Al-Fikri", 240, 191, { align: "center" });
+
+            // Simpan File PDF
+            const safeName = studentName.replace(/[^a-zA-Z0-9]/g, "_");
+            doc.save(`Sertifikat_Bahasa_Inggris_${safeName}_SDIT_AlFikri.pdf`);
+        }
+    </script>
+</body>
+</html>
